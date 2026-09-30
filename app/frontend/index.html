@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>无人机航迹冲突消解台</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>无人机航迹冲突消解台</h1>
+  <div class="header-actions">
+    <select id="scenarioSelect" title="已保存场景"></select>
+    <button id="btnLoadScenario">载入场景</button>
+    <button id="btnSampleA">示例 A（有解）</button>
+    <button id="btnSampleB">示例 B（无解）</button>
+    <label class="file-btn">
+      导入 JSON <input type="file" id="fileInput" accept=".json,application/json" hidden>
+    </label>
+    <button id="btnSaveScenario">保存为场景</button>
+    <button id="btnPlans">已存方案</button>
+  </div>
+</header>
+
+<main>
+  <section class="panel panel-left">
+    <div class="panel-section">
+      <h2>安全参数</h2>
+      <div class="form-row">
+        <label>安全半径 R（米）<input type="number" id="safetyRadius" min="1" step="1" value="50"></label>
+        <label>安全高度 H（米）<input type="number" id="safetyHeight" min="1" step="1" value="15"></label>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <h2>架次（共 <span id="flightCount">0</span>）</h2>
+      <div class="toolbar">
+        <button id="btnSolve" class="primary">求解无冲突时刻</button>
+        <button id="btnClearLocks">清除锁定</button>
+        <button id="btnSavePlan" disabled>保存当前方案</button>
+      </div>
+      <div id="solverSummary" class="solver-summary"></div>
+      <div class="table-wrap">
+        <table id="flightTable">
+          <thead>
+            <tr>
+              <th>颜色</th><th>架次 ID</th><th>权重</th><th>窗口</th>
+              <th>最早</th><th>求解时刻</th><th>延误</th><th>锁定</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <h2>冲突报告（<span id="viewModeLabel">最早起飞</span>）</h2>
+      <div class="view-toggle">
+        <label><input type="radio" name="viewMode" value="earliest" checked> 最早起飞时刻</label>
+        <label><input type="radio" name="viewMode" value="solved"> 求解方案</label>
+      </div>
+      <div id="conflictList" class="conflict-list"></div>
+    </div>
+
+    <div class="panel-section" id="musSection" hidden>
+      <h2>无解诊断：极小冲突架次集合（MUS）</h2>
+      <div id="musList" class="mus-list"></div>
+    </div>
+  </section>
+
+  <section class="panel panel-right">
+    <div class="panel-section">
+      <h2>航迹俯视图（XY 平面，米）</h2>
+      <canvas id="mapCanvas" width="820" height="430"></canvas>
+      <div class="legend">
+        <span><i class="swatch earliest"></i>最早起飞冲突点</span>
+        <span><i class="swatch solved"></i>求解后位置</span>
+        <span>⊙ 起飞点　▢ 终点　虚线圆=安全半径</span>
+      </div>
+    </div>
+    <div class="panel-section">
+      <h2>时间轴（秒）—— 点击/拖动条带可调整起飞时刻，双击锁定</h2>
+      <canvas id="timelineCanvas" width="820" height="260"></canvas>
+      <div class="legend">
+        <span><i class="bar earliest-bar"></i>最早起飞</span>
+        <span><i class="bar solved-bar"></i>当前/求解起飞</span>
+        <span><i class="bar lock-bar"></i>锁定</span>
+        <span><i class="swatch earliest"></i>冲突时段</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="modalBackdrop" class="modal-backdrop" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">标题</h3>
+      <button id="modalClose">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

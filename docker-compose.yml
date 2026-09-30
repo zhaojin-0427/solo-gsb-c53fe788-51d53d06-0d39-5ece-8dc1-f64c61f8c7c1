@@ -1,0 +1,12 @@
+services:
+  drone-conflict:
+    build: .
+    container_name: drone-conflict-console
+    ports:
+      - "8000:8000"
+    volumes:
+      - drone-data:/data
+    restart: unless-stopped
+
+volumes:
+  drone-data:
